@@ -1,0 +1,38 @@
+﻿@using DasBlog.Web.Models.BlogViewModels;
+
+@model ListCommentsViewModel
+@inject IDasBlogSettings dasBlogSettings
+
+@if (dasBlogSettings.SiteConfiguration.EnableComments && Model?.Comments != null)
+{
+    <hr />
+    <h3 class="comment-section-title" id="@DasBlog.Core.Common.Constants.CommentsStartId">Comment Section</h3>
+
+    <div class="post-comments">
+        <div class="post-comments-list">
+            @if (Model.ShowComments && Model.Comments.Count > 0)
+            {
+                foreach (var comment in Model.Comments)
+                {
+                    <partial name="_CommentPartial" model="comment" />
+                    <hr />
+                }
+            }
+        </div>
+        @if (Model.AllowComments && dasBlogSettings.AreCommentsPermitted(Model.PostDate))
+        {
+            @if(Model.CurrentComment != null)
+            {
+            <partial name="_CommentAddPartial" model="Model.CurrentComment" />
+            }
+            else
+            {
+            <partial name="_CommentAddPartial" model="new AddCommentViewModel() { TargetEntryId = Model.PostId }" />
+            }
+        }
+        else
+        {
+            <p>Comments are closed.</p>
+        }
+    </div>
+}

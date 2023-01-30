@@ -1,0 +1,94 @@
+﻿@using System.Linq.Expressions
+@using Microsoft.EntityFrameworkCore
+@using LinkDotNet.Blog.Domain
+@using LinkDotNet.Blog.Infrastructure.Persistence
+@using LinkDotNet.Blog.Infrastructure.Persistence.Sql
+@using LinkDotNet.Blog.Web.Features.Admin.Dashboard.Services
+@using X.PagedList
+@inject IRepository<BlogPost> BlogPostRepository
+@inject IRepository<UserRecord> UserRecordRepository
+
+<div class="card">
+    <div class="card-header">Blog Post Visit Counts</div>
+    <div class="card-body">
+        <div class="row">
+            <DateRangeSelector FilterChanged="RefreshVisitCount"></DateRangeSelector>
+            @if (visitData != null)
+            {
+                <p id="total-clicks">@visitData.Sum(c => c.ClickCount) clicks in total</p>
+            }
+            else
+            {
+                <p id="total-clicks">Loading...</p>
+            }
+            <table class="table table-striped table-hover">
+                <tbody>
+                <tr>
+                    <th>Title</th>
+                    <th>Clicks</th>
+                    <th>Likes</th>
+                </tr>
+                @if (visitData != null)
+                {
+                    @foreach (var date in visitData)
+                    {
+                        <tr>
+                            <td><a href="blogPost/@date.Id">@date.Title</a></td>
+                            <td>@date.ClickCount</td>
+                            <td>@date.Likes</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <Loading></Loading>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private Filter filter = new();
+    private IList<VisitCountPageData> visitData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        visitData = await LoadBlogPostInformationAsync();
+    }
+
+    private async Task<List<VisitCountPageData>> LoadBlogPostInformationAsync()
+    {
+        var blogPostsTask = BlogPostRepository.GetAllByProjectionAsync(
+            s => new { s.Id, s.Title, s.Likes });
+
+        var userRecordsTask = UserRecordRepository.GetAllByProjectionAsync(
+            s => s.UrlClicked,
+            ur => (!filter.StartDate.HasValue || ur.DateTimeUtcClicked >= filter.StartDate)
+                  && (!filter.EndDate.HasValue || ur.DateTimeUtcClicked <= filter.EndDate));
+
+        var blogPosts = await blogPostsTask;
+        var userRecords = await userRecordsTask;
+
+        var visitCountPage = (from ur in userRecords
+            join bp in blogPosts on ur.Replace("blogPost/", string.Empty) equals bp.Id
+            group new { ur, bp } by new { ur } into gp
+            orderby gp.Count() descending
+            select new VisitCountPageData
+            {
+                Id = gp.First().bp.Id,
+                Title = gp.First().bp.Title,
+                Likes = gp.First().bp.Likes,
+                ClickCount = gp.Count()
+            }).ToList();
+        return visitCountPage;
+    }
+
+    private async Task RefreshVisitCount(Filter newBeginning)
+    {
+        filter = newBeginning;
+        visitData = await LoadBlogPostInformationAsync();
+    }
+}

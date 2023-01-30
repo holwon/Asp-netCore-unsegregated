@@ -1,0 +1,17 @@
+﻿@model ListPostsViewModel
+
+
+@if (Model?.Posts?.Count > 0)
+{
+    int order = 0;
+
+    foreach (var post in Model.Posts)
+    {
+        post.Order = order++;
+        <partial name="_BlogItemSummary" model="post" />
+    }
+}
+else
+{
+    <p>No posts found!</p>
+}

@@ -1,0 +1,15 @@
+﻿@model ListPostsViewModel
+
+
+@if (Model?.Posts?.Count > 0)
+{
+    foreach (var post in Model.Posts)
+    {
+        <partial name="_BlogItem" model="post" />
+    }
+}
+else
+{
+    <p>No posts found!</p>
+}
+

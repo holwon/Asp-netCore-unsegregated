@@ -1,0 +1,12 @@
+﻿@inject IDasBlogSettings dasBlogSettings
+
+<script type="application/ld+json">
+    {
+    "@@context": "http://schema.org",
+    "@@type": "BlogPosting",
+    "headline": "@ViewData["PageTitle"]",
+    "description": "@ViewData["Description"]",
+    "url": "@ViewData["Canonical"]",
+    "image": "@ViewData["PageImageUrl"]"
+    }
+</script>

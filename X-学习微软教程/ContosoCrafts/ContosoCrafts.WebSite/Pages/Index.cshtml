@@ -1,0 +1,20 @@
+﻿@page
+@using ContosoCrafts.WebSite.Components;
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+@(await Html.RenderComponentAsync<ProductList>(RenderMode.ServerPrerendered))
+
+
+@*教程里面是 dotnet 3.1, 需要加上这一句. 但是此项目是 dotnet6, 不知是否应该加上此语句*@
+@*//这条注释错误,这条语句是blazor框架要用的 不用管 => 因为 _framework/blazor.server.js 不知道在哪里, 也许 dotnet6 不存在此文件*@
+@*<|不知道这文件作用 => _framework/blazor.server.js|> 
+    答: 此脚本是blazor框架要用的,我们可以随便把他放在布局内的任何地方*@
+<script src="_framework/blazor.server.js"></script>

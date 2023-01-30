@@ -1,0 +1,81 @@
+﻿@using DasBlog.Core.Common
+@model List<MonthViewViewModel>
+
+@{
+    var previous = (DateTime)ViewBag.PreviousMonth;
+    var current = (DateTime)ViewBag.CurrentMonth;
+    var next = (DateTime)ViewBag.NextMonth;
+    var css = string.Empty;
+}
+
+@{
+    ViewData["Title"] = Constants.ArchivePageTitle;
+}
+
+<span class="dbc-span-month-control">
+    <span class="dbc-span-month-control-older">
+        <a asp-controller="Archive" asp-action="Archive" asp-route-year="@previous.Year" asp-route-month="@previous.Month">&lt;&lt;</a>
+    </span>
+
+    <span class="dbc-span-month-text font-weight-bold mb-0"> @($"{current:MMMM yyyy}") </span>
+
+    <span class="dbc-span-month-control-newer">
+        <a asp-controller="Archive" asp-action="Archive" asp-route-year="@next.Year" asp-route-month="@next.Month"> &gt;&gt;</a>
+    </span>
+</span>
+
+<div class="dbc-calendar shadow p-2">
+    <div class="d-flex align-items-center">
+        <i class="fa fa-calendar fa-3x mr-3"></i>
+    </div>
+
+
+    <ol class="day-names list-unstyled">
+        <li class="font-weight-bold">Sun</li>
+        <li class="font-weight-bold">Mon</li>
+        <li class="font-weight-bold">Tue</li>
+        <li class="font-weight-bold">Wed</li>
+        <li class="font-weight-bold">Thu</li>
+        <li class="font-weight-bold">Fri</li>
+        <li class="font-weight-bold">Sat</li>
+    </ol>
+
+    <ol class="days list-unstyled">
+        @foreach (var mvvm in Model)
+        {
+            @foreach (var dayentry in mvvm.MonthEntries)
+            {
+                @if (current.Month == dayentry.Key.Month)
+                {
+                    css = "";
+                }
+                else
+                {
+                    css = "outside";
+                }
+
+                <li class="@css">
+                    <div class="date">
+                        @if (dayentry.Key.Day == 1)
+                        {
+                            @($"{dayentry.Key:MMM d}")
+                        }
+                        else
+                        {
+                            @dayentry.Key.Day
+                        }
+                    </div>
+
+                    @foreach (var entry in dayentry.Value)
+                    {
+                        <div>
+                            <post-title-link post="@entry" css="dbc-archive-anchor event" />
+                        </div>
+                    }
+                </li>
+            }
+        }
+    </ol>
+</div>
+
+

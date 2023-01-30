@@ -1,0 +1,34 @@
+﻿@inject NavigationManager NavigationManager
+
+<HeadContent>
+    <meta name="title" property="og:title" content="@Title" />
+    <link rel="canonical" href="@NavigationManager.Uri" />
+    @if (AbsolutePreviewImageUrl != null)
+    {
+        <meta name="image" property="og:image" content="@AbsolutePreviewImageUrl"/>
+    }
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="@NavigationManager.Uri" />
+    @if (Keywords != null)
+    {
+        <meta name="keywords" content="@Keywords"/>
+    }
+    @if (Description != null)
+    {
+        <meta name="description" property="og:description" content="@Description" />
+    }
+</HeadContent>
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string AbsolutePreviewImageUrl { get; set; }
+    
+    [Parameter]
+    public string Description { get; set; }
+    
+    [Parameter]
+    public string Keywords { get; set; }
+}
